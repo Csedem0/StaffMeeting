@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Staff Meeting Minutes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    h1 {
+      border-bottom: 2px solid #2c3e50;
+      padding-bottom: 10px;
+    }
+    h2 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    ul, ol {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 10px;
+    }
+    input[type="text"] {
+      width: calc(100% - 22px);
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #2c3e50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: block;
+      margin: 20px auto;
+    }
+    button:hover {
+      background-color: #34495e;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+  </style>
+</head>
+<body>
+  <h1>Staff Meeting</h1>
+  <h2>MEETING MINUTES</h2>
+  <form id="meetingForm">
+    <ul>
+      <li><strong>Date:</strong><br><input type="text" id="date" name="date" required></li>
+      <li><strong>Last Meeting:</strong><br><input type="text" id="lastMeeting" name="lastMeeting" required></li>
+      <li><strong>Purpose of Meeting:</strong><br><input type="text" id="purpose" name="purpose" required></li>
+      <li><strong>Time:</strong><br><input type="text" id="time" name="time" required></li>
+      <li><strong>Location:</strong><br><input type="text" id="location" name="location" value="Google Meet Meeting" required></li>
+      <li><strong>Chair:</strong><br><input type="text" id="chair" name="chair" required></li>
+      <li><strong>Secretary:</strong><br><input type="text" id="secretary" name="secretary" required></li>
+    </ul>
+    <h2>ATTENDEES:</h2>
+    <ol>
+      <li><input type="text" name="attendee1" required></li>
+      <li><input type="text" name="attendee2" required></li>
+      <li><input type="text" name="attendee3" required></li>
+      <li><input type="text" name="attendee4" required></li>
+      <li><input type="text" name="attendee5" required></li>
+      <li><input type="text" name="attendee6" required></li>
+      <li><input type="text" name="attendee7" required></li>
+      <li><input type="text" name="attendee8" required></li>
+      <li><input type="text" name="attendee9" required></li>
+    </ol>
+    <h2>Topic Discussion/Meeting Notes</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Topic Discussion</th>
+          <th>Meeting Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input type="text" name="topic1" required></td>
+          <td><input type="text" name="note1" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic2" required></td>
+          <td><input type="text" name="note2" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic3" required></td>
+          <td><input type="text" name="note3" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic4" required></td>
+          <td><input type="text" name="note4" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic5" required></td>
+          <td><input type="text" name="note5" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic6" required></td>
+          <td><input type="text" name="note6" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic7" required></td>
+          <td><input type="text" name="note7" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic8" required></td>
+          <td><input type="text" name="note8" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic9" required></td>
+          <td><input type="text" name="note9" required></td>
+        </tr>
+      </tbody>
+    </table>
+    <p><strong>Prepared By:</strong><br><input type="text" id="preparedBy" name="preparedBy" required></p>
+    <p><strong>Witness:</strong><br><input type="text" id="witness" name="witness" required></p>
+    <button type="button" onclick="generatePDF()">Save as PDF</button>
+  </form>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+  <script>
+    async function generatePDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      // Set styles
+      const titleFontSize = 20;
+      const subtitleFontSize = 16;
+      const textFontSize = 12;
+      const lineHeight = 10;
+      const marginLeft = 10;
+      let startY = 20;
+      const pageHeight = doc.internal.pageSize.height;
+
+      function addText(text, fontSize = textFontSize) {
+                        doc.setFontSize(fontSize);
+                        const textWidth = doc.getStringUnitWidth(text) * fontSize / doc.internal.scaleFactor;
+                        const remainingText = doc.splitTextToSize(text, doc.internal.pageSize.width - 2 * marginLeft);
+                        if (startY + (remainingText.length + 1) * lineHeight > pageHeight) {
+                            doc.addPage();
+                            startY = 20;
+                        }
+                        doc.text(remainingText, marginLeft, startY);
+                        startY += (remainingText.length + 1) * lineHeight;
+                    }
+
+      // Add title
+      addText("Staff Meeting", titleFontSize);
+      addText("MEETING MINUTES", subtitleFontSize);
+
+      // Get form values
+      const date = document.getElementById('date').value;
+      const lastMeeting = document.getElementById('lastMeeting').value;
+      const purpose = document.getElementById('purpose').value;
+      const time = document.getElementById('time').value;
+      const location = document.getElementById('location').value;
+      const chair = document.getElementById('chair').value;
+      const secretary = document.getElementById('secretary').value;
+      const attendees = [
+        document.getElementsByName('attendee1')[0].value,
+        document.getElementsByName('attendee2')[0].value,
+        document.getElementsByName('attendee3')[0].value,
+        document.getElementsByName('attendee4')[0].value,
+        document.getElementsByName('attendee5')[0].value,
+        document.getElementsByName('attendee6')[0].value,
+        document.getElementsByName('attendee7')[0].value,
+        document.getElementsByName('attendee8')[0].value,
+        document.getElementsByName('attendee9')[0].value,
+      ];
+      const topics = [
+        document.getElementsByName('topic1')[0].value,
+        document.getElementsByName('topic2')[0].value,
+        document.getElementsByName('topic3')[0].value,
+        document.getElementsByName('topic4')[0].value,
+        document.getElementsByName('topic5')[0].value,
+        document.getElementsByName('topic6')[0].value,
+        document.getElementsByName('topic7')[0].value,
+        document.getElementsByName('topic8')[0].value,
+        document.getElementsByName('topic9')[0].value,
+      ];
+      const notes = [
+        document.getElementsByName('note1')[0].value,
+        document.getElementsByName('note2')[0].value,
+        document.getElementsByName('note3')[0].value,
+        document.getElementsByName('note4')[0].value,
+        document.getElementsByName('note5')[0].value,
+        document.getElementsByName('note6')[0].value,
+        document.getElementsByName('note7')[0].value,
+        document.getElementsByName('note8')[0].value,
+        document.getElementsByName('note9')[0].value,
+      ];
+      const preparedBy = document.getElementById('preparedBy').value;
+      const witness = document.getElementById('witness').value;
+
+      // Add form details
+      addText(`Date: ${date}`);
+      addText(`Last Meeting: ${lastMeeting}`);
+      addText(`Purpose of Meeting: ${purpose}`);
+      addText(`Time: ${time}`);
+      addText(`Location: ${location}`);
+      addText(`Chair: ${chair}`);
+      addText(`Secretary: ${secretary}`);
+
+      // Add attendees
+      addText("ATTENDEES:", subtitleFontSize);
+      attendees.forEach((attendee, index) => {
+        addText(`${index + 1}. ${attendee}`);
+      });
+
+      // Add topic discussion and meeting notes
+      addText("Topic Discussion/Meeting Notes", subtitleFontSize);
+      topics.forEach((topic, index) => {
+        addText(`Topic ${index + 1}: ${topic}`);
+        addText(`Notes: ${notes[index]}`);
+      });
+
+      // Add prepared by and witness
+      addText(`Prepared By: ${preparedBy}`);
+      addText(`Witness: ${witness}`);
+
+      // Save the PDF
+      doc.save('Staff_Meeting_Minutes.pdf');
+    }
+  </script>
+</body>
+</html>
