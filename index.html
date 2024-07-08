@@ -25,13 +25,16 @@
     li {
       margin-bottom: 10px;
     }
-    input[type="text"] {
+    input[type="text"], textarea {
       width: calc(100% - 22px);
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 4px;
       margin-bottom: 10px;
       box-sizing: border-box;
+    }
+    textarea {
+      resize: vertical;
     }
     button {
       background-color: #2c3e50;
@@ -68,16 +71,25 @@
       width: 100px;
       margin-right: 20px;
     }
+    #signatureCanvas {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 300px;
+      height: 100px;
+      margin-bottom: 10px;
+      display: block;
+      margin: 0 auto;
+    }
+    #clearSignature {
+      background-color: #e74c3c;
+    }
+    #clearSignature:hover {
+      background-color: #c0392b;
+    }
   </style>
 </head>
 <body>
-  <div class="logo-holder">
-    <img src="rahlogo.jpg" alt="Company Logo" class="img">
-    <div>
-      <h2>COMPANY NAME</h2>
-      <p>RAH REAL ESTATE DEVELOPMENT AND TRANSPORTATION LIMITED</p>
-    </div>
-  </div>
+  
   <h1>Staff Meeting</h1>
   <h2>MEETING MINUTES</h2>
   <form id="meetingForm">
@@ -90,6 +102,18 @@
       <li><strong>Chair:</strong><br><input type="text" id="chair" name="chair" required></li>
       <li><strong>Secretary:</strong><br><input type="text" id="secretary" name="secretary" required></li>
     </ul>
+    <h2>Summary of Last Meeting</h2>
+    <textarea id="summaryLastMeeting" name="summaryLastMeeting" rows="4" required></textarea>
+    <p><strong>ATTENTION:</strong></p>
+    <p>
+      It is extremely important for you to read this agenda prior to attending the meeting. In order for you to be prepared, you must read the meeting agenda and come to the meeting prepared with any information, suggestions, or concerns you may have regarding the topics provided.
+    </p>
+    <p>
+      If there is a topic not yet listed that you find important, please contact the staff member who created the agenda in order to provide your suggested topic. Please also provide a note for the description of points that can be discussed.
+    </p>
+    <p>
+      DURING THE MEETING: Your input is important; please provide your opinions as it assists the company in its growth.
+    </p>
     <h2>ATTENDEES:</h2>
     <ol>
       <li><input type="text" name="attendee1" required></li>
@@ -101,6 +125,7 @@
       <li><input type="text" name="attendee7" required></li>
       <li><input type="text" name="attendee8" required></li>
       <li><input type="text" name="attendee9" required></li>
+      <li><input type="text" name="attendee10" required></li>
     </ol>
     <h2>Topic Discussion/Meeting Notes</h2>
     <table>
@@ -147,117 +172,220 @@
           <td><input type="text" name="topic9" required></td>
           <td><input type="text" name="note9" required></td>
         </tr>
+        <tr>
+          <td><input type="text" name="topic10" required></td>
+          <td><input type="text" name="note10" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic11" required></td>
+          <td><input type="text" name="note11" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic12" required></td>
+          <td><input type="text" name="note12" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic13" required></td>
+          <td><input type="text" name="note13" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic14" required></td>
+          <td><input type="text" name="note14" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic15" required></td>
+          <td><input type="text" name="note15" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic16" required></td>
+          <td><input type="text" name="note16" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic17" required></td>
+          <td><input type="text" name="note17" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic18" required></td>
+          <td><input type="text" name="note18" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic19" required></td>
+          <td><input type="text" name="note19" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic20" required></td>
+          <td><input type="text" name="note20" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic21" required></td>
+          <td><input type="text" name="note21" required></td>
+        </tr>
+        <tr>
+          <td><input type="text" name="topic22" required></td>
+          <td><input type="text" name="note22" required></td>
+        </tr>
       </tbody>
     </table>
     <p><strong>Prepared By:</strong><br><input type="text" id="preparedBy" name="preparedBy" required></p>
     <p><strong>Witness:</strong><br><input type="text" id="witness" name="witness" required></p>
+    <h2>Signature:</h2>
+    <canvas id="signatureCanvas"></canvas>
+    <button type="button" id="clearSignature">Clear Signature</button>
+    <button type="button" onclick="saveProgress()">Save Progress</button>
     <button type="button" onclick="generatePDF()">Save as PDF</button>
   </form>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
   <script>
-    async function generatePDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+    const { jsPDF } = window.jspdf;
 
-      // Set styles
-      const titleFontSize = 20;
+    // Function to save progress
+    function saveProgress() {
+      const form = document.getElementById('meetingForm');
+      const formData = new FormData(form);
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+      const signature = document.getElementById('signatureCanvas').toDataURL();
+      data.signature = signature;
+      localStorage.setItem('meetingFormData', JSON.stringify(data));
+      alert('Progress saved successfully!');
+    }
+
+    // Function to load progress
+    function loadProgress() {
+      const data = JSON.parse(localStorage.getItem('meetingFormData'));
+      if (data) {
+        Object.keys(data).forEach(key => {
+          const element = document.querySelector(`[name="${key}"]`);
+          if (element) {
+            element.value = data[key];
+          }
+        });
+        if (data.signature) {
+          const canvas = document.getElementById('signatureCanvas');
+          const ctx = canvas.getContext('2d');
+          const img = new Image();
+          img.onload = function() {
+            ctx.drawImage(img, 0, 0);
+          }
+          img.src = data.signature;
+        }
+      }
+    }
+
+    // Function to generate PDF
+    function generatePDF() {
+      const doc = new jsPDF();
+      const titleFontSize = 22;
       const subtitleFontSize = 16;
       const textFontSize = 12;
-      const lineHeight = 10;
       const marginLeft = 10;
-      let startY = 20;
       const pageHeight = doc.internal.pageSize.height;
+      const lineHeight = 1.15;
+      let startY = 20;
 
-      function addText(text, fontSize = textFontSize) {
-                        doc.setFontSize(fontSize);
-                        const textWidth = doc.getStringUnitWidth(text) * fontSize / doc.internal.scaleFactor;
-                        const remainingText = doc.splitTextToSize(text, doc.internal.pageSize.width - 2 * marginLeft);
-                        if (startY + (remainingText.length + 1) * lineHeight > pageHeight) {
-                            doc.addPage();
-                            startY = 20;
-                        }
-                        doc.text(remainingText, marginLeft, startY);
-                        startY += (remainingText.length + 1) * lineHeight;
-                    }
+      function addText(text, fontSize, marginY = 0) {
+        const textLines = doc.splitTextToSize(text, 190);
+        doc.setFontSize(fontSize);
+        doc.text(textLines, marginLeft, startY + marginY);
+        startY += textLines.length * fontSize * lineHeight + marginY;
+        if (startY > pageHeight - 20) {
+          doc.addPage();
+          startY = 20;
+        }
+      }
 
-      // Add title
-      addText("Staff Meeting", titleFontSize);
-      addText("MEETING MINUTES", subtitleFontSize);
+      addText('Staff Meeting', titleFontSize, 10);
+      addText('MEETING MINUTES', subtitleFontSize, 10);
+      addText(`Date: ${document.getElementById('date').value}`, textFontSize, 5);
+      addText(`Last Meeting: ${document.getElementById('lastMeeting').value}`, textFontSize, 5);
+      addText(`Purpose of Meeting: ${document.getElementById('purpose').value}`, textFontSize, 5);
+      addText(`Time: ${document.getElementById('time').value}`, textFontSize, 5);
+      addText(`Location: ${document.getElementById('location').value}`, textFontSize, 5);
+      addText(`Chair: ${document.getElementById('chair').value}`, textFontSize, 5);
+      addText(`Secretary: ${document.getElementById('secretary').value}`, textFontSize, 5);
+      addText('Summary of Last Meeting', subtitleFontSize, 10);
+      addText(`${document.getElementById('summaryLastMeeting').value}`, textFontSize, 5);
 
-      // Get form values
-      const date = document.getElementById('date').value;
-      const lastMeeting = document.getElementById('lastMeeting').value;
-      const purpose = document.getElementById('purpose').value;
-      const time = document.getElementById('time').value;
-      const location = document.getElementById('location').value;
-      const chair = document.getElementById('chair').value;
-      const secretary = document.getElementById('secretary').value;
-      const attendees = [
-        document.getElementsByName('attendee1')[0].value,
-        document.getElementsByName('attendee2')[0].value,
-        document.getElementsByName('attendee3')[0].value,
-        document.getElementsByName('attendee4')[0].value,
-        document.getElementsByName('attendee5')[0].value,
-        document.getElementsByName('attendee6')[0].value,
-        document.getElementsByName('attendee7')[0].value,
-        document.getElementsByName('attendee8')[0].value,
-        document.getElementsByName('attendee9')[0].value,
-      ];
-      const topics = [
-        document.getElementsByName('topic1')[0].value,
-        document.getElementsByName('topic2')[0].value,
-        document.getElementsByName('topic3')[0].value,
-        document.getElementsByName('topic4')[0].value,
-        document.getElementsByName('topic5')[0].value,
-        document.getElementsByName('topic6')[0].value,
-        document.getElementsByName('topic7')[0].value,
-        document.getElementsByName('topic8')[0].value,
-        document.getElementsByName('topic9')[0].value,
-      ];
-      const notes = [
-        document.getElementsByName('note1')[0].value,
-        document.getElementsByName('note2')[0].value,
-        document.getElementsByName('note3')[0].value,
-        document.getElementsByName('note4')[0].value,
-        document.getElementsByName('note5')[0].value,
-        document.getElementsByName('note6')[0].value,
-        document.getElementsByName('note7')[0].value,
-        document.getElementsByName('note8')[0].value,
-        document.getElementsByName('note9')[0].value,
-      ];
-      const preparedBy = document.getElementById('preparedBy').value;
-      const witness = document.getElementById('witness').value;
+      addText('ATTENTION:', subtitleFontSize, 10);
+      addText('It is extremely important for you to read this agenda prior to attending the meeting. In order for you to be prepared, you must read the meeting agenda and come to the meeting prepared with any information, suggestions, or concerns you may have regarding the topics provided.', textFontSize, 5);
+      addText('If there is a topic not yet listed that you find important, please contact the staff member who created the agenda in order to provide your suggested topic. Please also provide a note for the description of points that can be discussed.', textFontSize, 5);
+      addText('DURING THE MEETING: Your input is important; please provide your opinions as it assists the company in its growth.', textFontSize, 5);
 
-      // Add form details
-      addText(`Date: ${date}`);
-      addText(`Last Meeting: ${lastMeeting}`);
-      addText(`Purpose of Meeting: ${purpose}`);
-      addText(`Time: ${time}`);
-      addText(`Location: ${location}`);
-      addText(`Chair: ${chair}`);
-      addText(`Secretary: ${secretary}`);
+      addText('ATTENDEES:', subtitleFontSize, 10);
+      for (let i = 1; i <= 10; i++) {
+        addText(`${i}. ${document.querySelector(`input[name="attendee${i}"]`).value}`, textFontSize, 5);
+      }
 
-      // Add attendees
-      addText("ATTENDEES:", subtitleFontSize);
-      attendees.forEach((attendee, index) => {
-        addText(`${index + 1}. ${attendee}`);
+      addText('Topic Discussion/Meeting Notes', subtitleFontSize, 10);
+      const tableData = [];
+      for (let i = 1; i <= 22; i++) {
+        tableData.push([
+          document.querySelector(`input[name="topic${i}"]`).value,
+          document.querySelector(`input[name="note${i}"]`).value
+        ]);
+      }
+
+      tableData.forEach((row, index) => {
+        if (startY + textFontSize * lineHeight > pageHeight - 20) {
+          doc.addPage();
+          startY = 20;
+        }
+        addText(`Topic ${index + 1}: ${row[0]}`, textFontSize, 5);
+        addText(`Note: ${row[1]}`, textFontSize, 5);
       });
 
-      // Add topic discussion and meeting notes
-      addText("Topic Discussion/Meeting Notes", subtitleFontSize);
-      topics.forEach((topic, index) => {
-        addText(`Topic ${index + 1}: ${topic}`);
-        addText(`Notes: ${notes[index]}`);
-      });
+      addText(`Prepared By: ${document.getElementById('preparedBy').value}`, textFontSize, 10);
+      addText(`Witness: ${document.getElementById('witness').value}`, textFontSize, 5);
 
-      // Add prepared by and witness
-      addText(`Prepared By: ${preparedBy}`);
-      addText(`Witness: ${witness}`);
+      // Add signature to the PDF
+      const signature = document.getElementById('signatureCanvas').toDataURL('image/png');
+      doc.addImage(signature, 'PNG', marginLeft, startY + 10, 100, 50);
 
-      // Save the PDF
       doc.save('Staff_Meeting_Minutes.pdf');
     }
+
+    // Signature canvas functionality
+    const canvas = document.getElementById('signatureCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+
+    canvas.addEventListener('mousedown', e => {
+      isDrawing = true;
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX, e.offsetY);
+    });
+
+    canvas.addEventListener('mousemove', e => {
+      if (isDrawing) {
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+      }
+    });
+
+    canvas.addEventListener('mouseup', () => {
+      if (isDrawing) {
+        ctx.stroke();
+        ctx.closePath();
+        isDrawing = false;
+      }
+    });
+
+    canvas.addEventListener('mouseout', () => {
+      if (isDrawing) {
+        ctx.stroke();
+        ctx.closePath();
+        isDrawing = false;
+      }
+    });
+
+    document.getElementById('clearSignature').addEventListener('click', () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+
+    window.onload = loadProgress;
   </script>
 </body>
 </html>
